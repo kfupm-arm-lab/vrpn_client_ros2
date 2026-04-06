@@ -4,7 +4,7 @@
 
   <node pkg="vrpn_client_ros2" exec="vrpn_client_node" >
     <param name="server" value="$(var server)"/>
-    <param name="port" value="'3883'"/>
+    <param name="port" value="3883"/>
     <param name="update_frequency" value="100.0"/>
     <param name="frame_id" value="world"/>
     <param name="use_server_time" value="false"/>

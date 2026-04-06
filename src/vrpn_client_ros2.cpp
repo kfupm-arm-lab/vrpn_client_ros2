@@ -354,7 +354,7 @@ namespace vrpn_client_ros2
     this->declare_parameter<int>("port", 3883);
     this->declare_parameter<float>("update_frequency", 240.0);
     this->declare_parameter<float>("refresh_tracker_frequency", 1.0);
-    this->declare_parameter<std::vector<std::string>>("trackers", {});
+    this->declare_parameter("trackers", std::vector<std::string>());
     host_ = getHostStringFromParams();
 
     RCLCPP_INFO_STREAM(this->get_logger(), "Connecting to VRPN server at " << host_);
