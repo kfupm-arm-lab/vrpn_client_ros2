@@ -383,15 +383,10 @@ namespace vrpn_client_ros2
       refresh_tracker_timer_ = this->create_wall_timer(my_timer_duration,
                                                        std::bind(&VrpnClientRos::updateTrackers, this));
     }
-    std::vector<std::string> param_tracker_names_;
-    if (this->get_parameter("trackers", param_tracker_names_))
-    {
-      for (std::vector<std::string>::iterator it = param_tracker_names_.begin();
-           it != param_tracker_names_.end(); ++it)
-      {
-        trackers_.insert(std::make_pair(*it, std::make_shared<VrpnTrackerRos>(*it, connection_, shared_from_this())));
-      }
-    }
+    this->get_parameter("trackers", configured_trackers_);
+    configured_trackers_timer_ = this->create_wall_timer(
+      std::chrono::milliseconds(0),
+      std::bind(&VrpnClientRos::registerConfiguredTrackers, this));
   }
 
   std::string VrpnClientRos::getHostStringFromParams()
@@ -438,6 +433,29 @@ namespace vrpn_client_ros2
                                                                          shared_from_this())));
       }
       i++;
+    }
+  }
+
+  void VrpnClientRos::registerConfiguredTrackers()
+  {
+    if (configured_trackers_timer_)
+    {
+      configured_trackers_timer_->cancel();
+      configured_trackers_timer_.reset();
+    }
+
+    auto node_handle = shared_from_this();
+    for (const auto & tracker_name : configured_trackers_)
+    {
+      if (tracker_name.empty() || trackers_.count(tracker_name) != 0)
+      {
+        continue;
+      }
+
+      RCLCPP_INFO_STREAM(this->get_logger(), "Registering configured tracker: " << tracker_name);
+      trackers_.insert(std::make_pair(
+        tracker_name,
+        std::make_shared<VrpnTrackerRos>(tracker_name, connection_, node_handle)));
     }
   }
 } // namespace vrpn_client_ros2

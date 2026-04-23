@@ -46,6 +46,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace vrpn_client_ros2
 {
@@ -127,6 +128,11 @@ namespace vrpn_client_ros2
      */
     void updateTrackers();
 
+    /**
+     * Register any trackers explicitly configured via parameters.
+     */
+    void registerConfiguredTrackers();
+
   private:
     std::string host_;
 
@@ -139,8 +145,9 @@ namespace vrpn_client_ros2
      * Map of registered trackers, accessible by name
      */
     TrackerMap trackers_;
+    std::vector<std::string> configured_trackers_;
     
-    rclcpp::TimerBase::SharedPtr refresh_tracker_timer_, mainloop_timer;
+    rclcpp::TimerBase::SharedPtr configured_trackers_timer_, refresh_tracker_timer_, mainloop_timer;
   };
 }  // namespace vrpn_client_ros
 
