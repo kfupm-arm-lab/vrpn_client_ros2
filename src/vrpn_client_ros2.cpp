@@ -168,7 +168,7 @@ namespace vrpn_client_ros2
       tracker->pose_pubs_.resize(sensor_index + 1);
     }
 
-    if (nh->get_topic_names_and_types().count("/"+tracker->topic_name + "/pose") == 0)
+    if (!tracker->pose_pubs_[sensor_index])
     {
       tracker->pose_pubs_[sensor_index] = nh->create_publisher<geometry_msgs::msg::PoseStamped>(tracker->topic_name + "/pose", 1);
     }
@@ -255,7 +255,7 @@ namespace vrpn_client_ros2
     }
     
 
-    if (nh->get_topic_names_and_types().count("/"+tracker->topic_name + "/twist") == 0)
+    if (!tracker->twist_pubs_[sensor_index])
     {
       tracker->twist_pubs_[sensor_index]= nh->create_publisher<geometry_msgs::msg::TwistStamped>(tracker->topic_name + "/twist", 1);
     }
@@ -312,7 +312,7 @@ namespace vrpn_client_ros2
     }
     
 
-    if (nh->get_topic_names_and_types().count(tracker->topic_name + "/accel") == 0)
+    if (!tracker->accel_pubs_[sensor_index])
     {
       tracker->accel_pubs_[sensor_index] = nh->create_publisher<geometry_msgs::msg::AccelStamped>(tracker->topic_name + "/accel", 1);
     }
@@ -425,11 +425,12 @@ namespace vrpn_client_ros2
     int i = 0;
     while (connection_->sender_name(i) != NULL)
     {
-      if (trackers_.count(connection_->sender_name(i)) == 0 && name_blacklist_.count(connection_->sender_name(i)) == 0)
+      std::string t_name = connection_->sender_name(i);
+      if (trackers_.count(t_name) == 0 && name_blacklist_.count(t_name) == 0)
       {
-        RCLCPP_INFO_STREAM(this->get_logger(), "Found new sender: " << connection_->sender_name(i));
-        trackers_.insert(std::make_pair(connection_->sender_name(i),
-                                        std::make_shared<VrpnTrackerRos>(connection_->sender_name(i), connection_,
+        RCLCPP_INFO_STREAM(this->get_logger(), "Found new sender: " << t_name);
+        trackers_.insert(std::make_pair(t_name,
+                                        std::make_shared<VrpnTrackerRos>(t_name, connection_,
                                                                          shared_from_this())));
       }
       i++;
